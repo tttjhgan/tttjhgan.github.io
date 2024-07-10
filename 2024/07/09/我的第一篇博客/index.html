@@ -171,6 +171,7 @@
   
 
         
+        
         <a href="/2024/07/09/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/" class="archive-article-date">
   	<time datetime="2024-07-09T09:17:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2024-07-09</time>
 </a>
@@ -316,6 +317,31 @@
       <footer id="footer">
   <div class="outer">
     <div id="footer-info">
+		<span id="busuanzi_container_site_pv">
+			&nbsp;&nbsp;&nbsp;
+			总访问量: <span id="busuanzi_value_site_pv"></span>
+			</span>|
+			<span id="busuanzi_container_site_uv">
+			总访客: <span id="busuanzi_value_site_uv"></span>
+			</span>
+			</br>
+			<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+			<script>
+				var now = new Date(); 
+				function createtime(){ var grt= new Date("07/29/2024 1:00:00");//此处修改你的建站时间或者网站上线时间 
+				now.setTime(now.getTime()+250); 
+				days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+				hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+				if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+				mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+				seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+				snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+				document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+				document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; } 
+				setInterval("createtime()",250);
+			</script>
+			<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
     	<div class="footer-left">
     		&copy; 2024 tttjh
     	</div>
