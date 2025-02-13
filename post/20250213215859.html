@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>文件上传 | 希望来有所获</title><meta name="author" content="田稼禾"><meta name="copyright" content="田稼禾"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="PHP 应用&amp;文件上传&amp;函数缺陷&amp;条件竞争&amp;二次渲染&amp;黑白名单&amp;JS 绕过学习前必读：1、课前一定要明白：无文件解析安全问题上，格式解析是一对一的（不能 jpg 解析 php）换句话来说有解析错误配置或后缀解析漏洞时才能实现格式差异解析2、文件上传安全指的是攻击者通过利用上传实现后门的写入连接后门进行权限控制的安全问题，对于如何确保这类安全问题，一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件上传">
+<meta property="og:url" content="https://tttjhgan.github.io/post/20250213215859.html">
+<meta property="og:site_name" content="希望来有所获">
+<meta property="og:description" content="PHP 应用&amp;文件上传&amp;函数缺陷&amp;条件竞争&amp;二次渲染&amp;黑白名单&amp;JS 绕过学习前必读：1、课前一定要明白：无文件解析安全问题上，格式解析是一对一的（不能 jpg 解析 php）换句话来说有解析错误配置或后缀解析漏洞时才能实现格式差异解析2、文件上传安全指的是攻击者通过利用上传实现后门的写入连接后门进行权限控制的安全问题，对于如何确保这类安全问题，一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tttjhgan.github.io/img/touxiang.png">
+<meta property="article:published_time" content="2025-02-13T13:58:59.000Z">
+<meta property="article:modified_time" content="2025-02-13T13:59:23.857Z">
+<meta property="article:author" content="田稼禾">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tttjhgan.github.io/img/touxiang.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "文件上传",
+  "url": "https://tttjhgan.github.io/post/20250213215859.html",
+  "image": "https://tttjhgan.github.io/img/touxiang.png",
+  "datePublished": "2025-02-13T13:58:59.000Z",
+  "dateModified": "2025-02-13T13:59:23.857Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "田稼禾",
+      "url": "https://tttjhgan.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/tubiao.png"><link rel="canonical" href="https://tttjhgan.github.io/post/20250213215859.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '文件上传',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/touxiang.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/beijing.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">希望来有所获</span></a><a class="nav-page-title" href="/"><span class="site-name">文件上传</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">文件上传</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-13T13:58:59.000Z" title="发表于 2025-02-13 21:58:59">2025-02-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-13T13:59:23.857Z" title="更新于 2025-02-13 21:59:23">2025-02-13</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><a target="_blank" rel="noopener" href="https://imgse.com/i/pEeYv4I"><img src="https://s21.ax1x.com/2025/02/05/pEeYv4I.png" alt="pEeYv4I.png"></a></p>
+<h1 id="PHP-应用-文件上传-函数缺陷-条件竞争-二次渲染-黑白名单-JS-绕过"><a href="#PHP-应用-文件上传-函数缺陷-条件竞争-二次渲染-黑白名单-JS-绕过" class="headerlink" title="PHP 应用&amp;文件上传&amp;函数缺陷&amp;条件竞争&amp;二次渲染&amp;黑白名单&amp;JS 绕过"></a>PHP 应用&amp;文件上传&amp;函数缺陷&amp;条件竞争&amp;二次渲染&amp;黑白名单&amp;JS 绕过</h1><h2 id="学习前必读："><a href="#学习前必读：" class="headerlink" title="学习前必读："></a>学习前必读：</h2><p>1、课前一定要明白：<br>无文件解析安全问题上，格式解析是一对一的（不能 jpg 解析 php）<br>换句话来说有解析错误配置或后缀解析漏洞时才能实现格式差异解析<br>2、文件上传安全指的是攻击者通过利用上传实现后门的写入连接后门进行权限控制的安全问题，对于如何确保这类安全问题，一般会从原生态功能中的文件内容，文件后缀，文件类型等方面判断，但是漏洞可能不仅在本身的代码验证逻辑中出现安全问题，也会在语言版本，语言函数，中间件，引用的第三方编辑器等存在缺陷地方配合利用。另外文件上传也有多个存储逻辑，不同的文件存储方案也会给攻击者带来不一样的挑战！</p>
+<h3 id="测试环境安装参考："><a href="#测试环境安装参考：" class="headerlink" title="测试环境安装参考："></a>测试环境安装参考：</h3><p><a target="_blank" rel="noopener" href="https://github.com/ffffffff0x/f8x">https://github.com/ffffffff0x/f8x</a><br><a target="_blank" rel="noopener" href="https://github.com/fuzzdb-project/fuzzdb">https://github.com/fuzzdb-project/fuzzdb</a><br><a target="_blank" rel="noopener" href="https://github.com/sqlsec/upload-labs-docker">https://github.com/sqlsec/upload-labs-docker</a></p>
+<p>0、下载上述资源<br>1、docker 安装<br>f8x -d 或 f8x -docker<br>2、进入项目文件夹<br>cd upload-labs-docker<br>3、一键部署运行<br>docker-compose up -d</p>
+<h2 id="upload-labs-docker-知识点："><a href="#upload-labs-docker-知识点：" class="headerlink" title="upload-labs-docker 知识点："></a>upload-labs-docker 知识点：</h2><p>1、前端 JS<br>如何判断是否是前端验证呢？ <font color="#ff0000">看源码</font><br>首先抓包监听，如果上传文件的时候还没有抓取到数据包，但是浏览器就提示文件类型不正确的话，那么这个多半就是前端校验了<br>绕过就是 ： jpg上穿  抓包然后改成php<br>2、.htaccess (这是apache的配置文件)<br>抓包配置 .htaccess<br>内容添加：<br>AddType application&#x2F;x-httpd-php .png  # 借助这个配置让.png的命名文件当做类型application&#x2F;x-httpd-php执行 (php的类型)<br>然后再上传png 图片码<br>3、MIME 类型<br>Content-Type：image&#x2F;png<br>Content-Type:application&#x2F;octet-stream<br>通过此文件头来判断文件类型 来过滤，直接抓包修改jpg为php即可<br>4、文件头判断<br>GIF89a 写在php文件中头部<br>5、黑名单判断<br>无递归绕过 ：修改后缀.phpphp 即可绕过为php<br>改成大小写绕过也可以 windows不区分<br>6、 php版本低于5.3.4<br>url上面抓包显示到有road&#x3D;&#x2F;var&#x2F;www&#x2F;upload<br>加上a.php%00 来截断他的上传 使得上传的jpg变成php</p>
+<p>post下面 有路径 截断需要 自己手工解码 %00<br>7、 黑名单限制上传类型 过滤不严<br>fuzzb 直接跑字典后缀<br>8、逻辑不严谨-条件竞争<br>先上传 后面判断 处理逻辑<br>访问即创建代码搞出来（访问了自动触发代码新建一个文件写入后台）<br><code>&lt;?php fputs(fopen(&#39;xiao.php&#39;,&#39;w&#39;),&#39;&lt;?php eval($_REQUEST[1];?)</code><br>上传&#x2F;访问 两个请求 不断发包 然后网页访问<br>9、二次渲染<br>先搞个正常图片，上传导出渲染后的图片<br>对比保留部分，在保留部分添加后门代码<br>最后利用提示的文件包含执行图片后门代码<br>10、函数缺陷<br>move_uploaded_file 1.php&#x2F;. 来重命名<br>11、代码审计_数组绕过<br>-174283082921961<br>&#96;Content-Disposition: form-data; name-“save_name[0]”</p>
+<p>·<a target="_blank" rel="noopener" href="http://2.php/">http://2.php/</a><br>-174283082921961<br>&#96;Content-Disposition: form-data; name “save_name[2]”</p>
+<h1 id="PHP-应用-文件上传-中间件-CVE-解析-第三方编辑器-已知-CMS-漏-洞"><a href="#PHP-应用-文件上传-中间件-CVE-解析-第三方编辑器-已知-CMS-漏-洞" class="headerlink" title="PHP 应用&amp;文件上传&amp;中间件 CVE 解析&amp;第三方编辑器&amp;已知 CMS 漏 洞"></a>PHP 应用&amp;文件上传&amp;中间件 CVE 解析&amp;第三方编辑器&amp;已知 CMS 漏 洞</h1><h2 id="PHP-中间件-上传相关-Apache-Nginx"><a href="#PHP-中间件-上传相关-Apache-Nginx" class="headerlink" title="PHP-中间件-上传相关-Apache&amp;Nginx"></a>PHP-中间件-上传相关-Apache&amp;Nginx</h2><p>复现漏洞环境：vulhub （ <a target="_blank" rel="noopener" href="https://vulhub.org/">https://vulhub.org/</a> ）<br>由于 PHP 搭建常用中间件：IIS，Apache，Nginx<br>Web 搭建在存在漏洞的中间件上，漏洞影响这文件的解析即配合上传</p>
+<h2 id="PHP-编辑器-上传相关-第三方处理引用"><a href="#PHP-编辑器-上传相关-第三方处理引用" class="headerlink" title="PHP-编辑器-上传相关-第三方处理引用"></a>PHP-编辑器-上传相关-第三方处理引用</h2><p>复现漏洞环境：ueditor<br>由于编辑器漏洞较少，实战碰到机会不大，主要理解漏洞产生的思路<br>参考： <a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2200036">https://cloud.tencent.com/developer/article/2200036</a><br>参考： <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45813980/article/details/126866682">https://blog.csdn.net/qq_45813980/article/details/126866682</a><br>引用到外部的第三方编辑器实现文件上传，编辑器的安全即是上传安全<br>PHP-CMS 源码-上传相关-已知识别到利用<br>复现漏洞环境：通达 OA-V11.2<br>从未知的源码体系测试原生态上传安全，现在是已知 CMS 源码架构，利用已知的漏洞测试</p>
+<h1 id="文件上传-存储安全-OSS-对象-分站-解析安全-解码还原-目录执行"><a href="#文件上传-存储安全-OSS-对象-分站-解析安全-解码还原-目录执行" class="headerlink" title="文件上传&amp;存储安全&amp;OSS 对象&amp;分站&amp;解析安全&amp;解码还原&amp;目录执行"></a>文件上传&amp;存储安全&amp;OSS 对象&amp;分站&amp;解析安全&amp;解码还原&amp;目录执行</h1><h2 id="文件-解析方案-执行权限-解码还原"><a href="#文件-解析方案-执行权限-解码还原" class="headerlink" title="文件-解析方案-执行权限&amp;解码还原"></a>文件-解析方案-执行权限&amp;解码还原</h2><p>1、执行权限<br>文件上传后存储目录不给执行权限<br>2、解码还原 比如图片固定base64解析<br>数据做存储，解析固定（文件后缀名无关）<br>文件上传后利用编码传输解码还原</p>
+<h2 id="文件-存储方案-分站存储-OSS-对象"><a href="#文件-存储方案-分站存储-OSS-对象" class="headerlink" title="文件-存储方案-分站存储&amp;OSS 对象"></a>文件-存储方案-分站存储&amp;OSS 对象</h2><p>1、分站存储<br>upload.xiaodi8.com 上传<br>images.xiaodi8.com 存储<br>2、OSS 对象<br>Access 控制-OSS 对象存储-Bucket 对象</p>
+<h2 id="如何判断"><a href="#如何判断" class="headerlink" title="如何判断"></a>如何判断</h2><p>实例分析判断</p>
+<h3 id="安全绕过"><a href="#安全绕过" class="headerlink" title="安全绕过"></a>安全绕过</h3><p>以上方案除目录设置权限如能换目录解析绕过外，其他均无解</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://tttjhgan.github.io">田稼禾</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://tttjhgan.github.io/post/20250213215859.html">https://tttjhgan.github.io/post/20250213215859.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://tttjhgan.github.io" target="_blank">希望来有所获</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/touxiang.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/post/20250202104000.html" title="有道翻译js漏洞"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">有道翻译js漏洞</div></div><div class="info-2"><div class="info-item-1">在有道的单词翻译界面，输入一个单词进行请求，然后观察网络发包，通过检查发现webtranslate是请求的具体实现，但是前端js代码被混淆，现在开始突破： 开始大体了解一个csdn的讲解来更好学习cURL所以 过滤器用的选Fetch&#x2F;XHR 然后看的是载荷与启动器 然后观察到参数i是传递的单词复制该请求的cURL(bash) （cmd的无法识别）到该网址(https://curlconverter.com/)中转成pythond代码的网络请求。补充CURL	 import requestscookies = &#123;    &#x27;OUTFOX_SEARCH_USER_ID&#x27;: &#x27;-807195057@112.6.224.59&#x27;,    &#x27;OUTFOX_SEARCH_USER_ID_NCOO&#x27;: &#x27;1295680981.8456256&#x27;,    &#x27;UM_distinctid&#x27;:...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/touxiang.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">田稼禾</div><div class="author-info-description">保持热爱与冷静</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PHP-%E5%BA%94%E7%94%A8-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0-%E5%87%BD%E6%95%B0%E7%BC%BA%E9%99%B7-%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89-%E4%BA%8C%E6%AC%A1%E6%B8%B2%E6%9F%93-%E9%BB%91%E7%99%BD%E5%90%8D%E5%8D%95-JS-%E7%BB%95%E8%BF%87"><span class="toc-number">1.</span> <span class="toc-text">PHP 应用&amp;文件上传&amp;函数缺陷&amp;条件竞争&amp;二次渲染&amp;黑白名单&amp;JS 绕过</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0%E5%89%8D%E5%BF%85%E8%AF%BB%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">学习前必读：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85%E5%8F%82%E8%80%83%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">测试环境安装参考：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#upload-labs-docker-%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">upload-labs-docker 知识点：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PHP-%E5%BA%94%E7%94%A8-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0-%E4%B8%AD%E9%97%B4%E4%BB%B6-CVE-%E8%A7%A3%E6%9E%90-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%BC%96%E8%BE%91%E5%99%A8-%E5%B7%B2%E7%9F%A5-CMS-%E6%BC%8F-%E6%B4%9E"><span class="toc-number">2.</span> <span class="toc-text">PHP 应用&amp;文件上传&amp;中间件 CVE 解析&amp;第三方编辑器&amp;已知 CMS 漏 洞</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PHP-%E4%B8%AD%E9%97%B4%E4%BB%B6-%E4%B8%8A%E4%BC%A0%E7%9B%B8%E5%85%B3-Apache-Nginx"><span class="toc-number">2.1.</span> <span class="toc-text">PHP-中间件-上传相关-Apache&amp;Nginx</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PHP-%E7%BC%96%E8%BE%91%E5%99%A8-%E4%B8%8A%E4%BC%A0%E7%9B%B8%E5%85%B3-%E7%AC%AC%E4%B8%89%E6%96%B9%E5%A4%84%E7%90%86%E5%BC%95%E7%94%A8"><span class="toc-number">2.2.</span> <span class="toc-text">PHP-编辑器-上传相关-第三方处理引用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0-%E5%AD%98%E5%82%A8%E5%AE%89%E5%85%A8-OSS-%E5%AF%B9%E8%B1%A1-%E5%88%86%E7%AB%99-%E8%A7%A3%E6%9E%90%E5%AE%89%E5%85%A8-%E8%A7%A3%E7%A0%81%E8%BF%98%E5%8E%9F-%E7%9B%AE%E5%BD%95%E6%89%A7%E8%A1%8C"><span class="toc-number">3.</span> <span class="toc-text">文件上传&amp;存储安全&amp;OSS 对象&amp;分站&amp;解析安全&amp;解码还原&amp;目录执行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E8%A7%A3%E6%9E%90%E6%96%B9%E6%A1%88-%E6%89%A7%E8%A1%8C%E6%9D%83%E9%99%90-%E8%A7%A3%E7%A0%81%E8%BF%98%E5%8E%9F"><span class="toc-number">3.1.</span> <span class="toc-text">文件-解析方案-执行权限&amp;解码还原</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6-%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88-%E5%88%86%E7%AB%99%E5%AD%98%E5%82%A8-OSS-%E5%AF%B9%E8%B1%A1"><span class="toc-number">3.2.</span> <span class="toc-text">文件-存储方案-分站存储&amp;OSS 对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD"><span class="toc-number">3.3.</span> <span class="toc-text">如何判断</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E7%BB%95%E8%BF%87"><span class="toc-number">3.3.1.</span> <span class="toc-text">安全绕过</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/post/20250213215859.html" title="文件上传">文件上传</a><time datetime="2025-02-13T13:58:59.000Z" title="发表于 2025-02-13 21:58:59">2025-02-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/post/20250202104000.html" title="有道翻译js漏洞">有道翻译js漏洞</a><time datetime="2025-02-02T02:40:00.000Z" title="发表于 2025-02-02 10:40:00">2025-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/post/20250201222237.html" title="Hello World">Hello World</a><time datetime="2025-02-01T14:22:37.936Z" title="发表于 2025-02-01 22:22:37">2025-02-01</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By 田稼禾</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索本站内容" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
